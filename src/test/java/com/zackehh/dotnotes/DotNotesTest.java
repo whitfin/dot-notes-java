@@ -57,6 +57,32 @@ public class DotNotesTest {
     }
 
     @Test
+    public void parseStringWithArrayIntoEmptyObjectUsingCreateWithIntegerKey() throws Exception {
+        JsonNode parsedObj = DotNotes.create("this['0'].rocks", factory.numberNode(5));
+
+        Assert.assertNotNull(parsedObj);
+        Assert.assertTrue(parsedObj.isObject());
+        Assert.assertTrue(parsedObj.has("this"));
+        Assert.assertTrue(parsedObj.get("this").isObject());
+        Assert.assertTrue(parsedObj.get("this").has("0"));
+        Assert.assertTrue(parsedObj.get("this").get("0").isObject());
+        Assert.assertTrue(parsedObj.get("this").get("0").has("rocks"));
+        Assert.assertTrue(parsedObj.get("this").get("0").get("rocks").isNumber());
+        Assert.assertEquals(parsedObj.get("this").get("0").get("rocks").asInt(), 5);
+    }
+
+    @Test
+    public void parseStringWithArrayIntoArrayUsingCreate() throws Exception {
+        JsonNode parsedObj = DotNotes.create("[0].test", factory.numberNode(5));
+
+        Assert.assertNotNull(parsedObj);
+        Assert.assertTrue(parsedObj.isArray());
+        Assert.assertEquals(parsedObj.size(), 1);
+        Assert.assertTrue(parsedObj.get(0).has("test"));
+        Assert.assertEquals(parsedObj.get(0).get("test").asInt(), 5);
+    }
+
+    @Test
     public void parseStringIntoExistingObjectUsingCreate() throws Exception {
         ObjectNode oldObj = factory.objectNode();
 
@@ -515,7 +541,7 @@ public class DotNotesTest {
     }
 
     @Test
-    public void iterationSkipsMissingNodes() throws Exception {
+    public void iterationDoesNotSkipMissingNodes() throws Exception {
         ObjectNode objectNode = factory.objectNode();
 
         objectNode.put("test1", 5);
@@ -530,7 +556,7 @@ public class DotNotesTest {
             }
         });
 
-        Assert.assertEquals(count[0], 1);
+        Assert.assertEquals(count[0], 2);
     }
 
     @Test(expectedExceptions = InvocationTargetException.class)
