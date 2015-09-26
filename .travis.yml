@@ -1,0 +1,8 @@
+language: java
+sudo: false
+jdk:
+  - oraclejdk8
+  - oraclejdk7
+  - openjdk7
+script: "mvn verify -B -P with-jacoco"
+after_success: "node coverage.js jacoco"
