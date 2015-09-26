@@ -14,7 +14,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.List;
-import java.util.StringJoiner;
 
 public class DotNotesTest {
 
@@ -494,12 +493,13 @@ public class DotNotesTest {
         Assert.assertNotNull(keys);
         Assert.assertEquals(keys.size(), 10);
 
-        StringJoiner sj = new StringJoiner(",");
+        StringBuilder sb = new StringBuilder();
         for(NotedKey key : keys){
-            sj.add(key.toString());
+            sb.append(key.toString()).append(",");
         }
+        sb.deleteCharAt(sb.lastIndexOf(","));
 
-        Assert.assertEquals(sj.toString(), "this,is,a,test,0,test,test,test,15,test");
+        Assert.assertEquals(sb.toString(), "this,is,a,test,0,test,test,test,15,test");
     }
 
     @Test
