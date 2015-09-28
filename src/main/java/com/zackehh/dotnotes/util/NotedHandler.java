@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * A very small interface used for processing the iteration
- * through a set of path->key tuples. Used alongside the
- * ${@link com.zackehh.dotnotes.DotCursor} class.
+ * through a set of path and key tuples. Used alongside the
+ * cursor class.
  */
 public interface NotedHandler {
 

@@ -13,12 +13,14 @@ This lib is built using Travis and has 100% code/line coverage, making it pretty
 
 ### Setup ###
 
-`dot-notes-java` is only available here as yet, however I'll attempt to push it to Maven central soon.
-
-Just build it as usual with Maven:
+`dot-notes-java` available on Maven central, via Sonatype OSS:
 
 ```
-$ mvn clean install
+<dependency>
+    <groupId>com.zackehh</groupId>
+    <artifactId>dot-notes</artifactId>
+    <version>1.0</version>
+</dependency>
 ```
 
 ### Notation ###

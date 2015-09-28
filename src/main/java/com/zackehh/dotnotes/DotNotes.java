@@ -43,7 +43,7 @@ public class DotNotes {
      * @param path the path to create
      * @param value the value to set the path to
      * @return the ${@link JsonNode} after key creation
-     * @throws ParseException
+     * @throws ParseException if any parsing issues occur
      */
     public static JsonNode create(String path, JsonNode value) throws ParseException {
         return create(path, value, null);
@@ -58,7 +58,7 @@ public class DotNotes {
      * @param value the value to set the path to
      * @param target the target ${@link JsonNode} to create into
      * @return the ${@link JsonNode} after key creation
-     * @throws ParseException
+     * @throws ParseException if any parsing issues occur
      */
     public static JsonNode create(String path, JsonNode value, JsonNode target) throws ParseException {
         // parse the path into a List of keys
@@ -166,7 +166,7 @@ public class DotNotes {
      * @param path the path to find the value for
      * @param node the node to use for the search
      * @return a ${@link JsonNode} if found, a ${@link MissingNode} if not
-     * @throws ParseException
+     * @throws ParseException if any parsing issues occur
      */
     public static JsonNode get(String path, JsonNode node) throws ParseException {
         // ensure that we have a valid JsonNode instance attached
@@ -223,7 +223,7 @@ public class DotNotes {
      *
      * @param node the ${@link JsonNode} to inflate
      * @return an inflated ${@link JsonNode} instance
-     * @throws ParseException
+     * @throws ParseException if any parsing issues occur
      */
     public static JsonNode inflate(ObjectNode node) throws ParseException {
         return inflate(node, null);
@@ -237,7 +237,7 @@ public class DotNotes {
      * @param node the node being inflated
      * @param target a potential target object to inflate into
      * @return an inflated ${@link JsonNode}
-     * @throws ParseException
+     * @throws ParseException if any parsing issues occur
      */
     public static JsonNode inflate(ObjectNode node, ObjectNode target) throws ParseException {
         // ensure we have a valid target node
@@ -265,7 +265,7 @@ public class DotNotes {
      *
      * @param s the String to parse
      * @return a List of ${@link NotedKey}s
-     * @throws ParseException
+     * @throws ParseException if any parsing issues occur
      */
     public static List<NotedKey> keys(String s) throws ParseException {
         // output keys
