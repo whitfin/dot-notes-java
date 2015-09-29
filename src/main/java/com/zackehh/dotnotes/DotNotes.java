@@ -65,11 +65,24 @@ public class DotNotes {
         List<NotedKey> keys = keys(path);
 
         // figure out the node we're creating into
-        JsonNode targetNode = target == null
-                ? keys.get(0).isNumber()
+        JsonNode targetNode = target;
+
+        // check null target
+        if (target == null) {
+            targetNode = keys.get(0).isNumber()
                     ? factory.arrayNode()
-                    : factory.objectNode()
-                : target;
+                    : factory.objectNode();
+        }
+
+        // check correct array type
+        if (keys.get(0).isNumber() && !targetNode.isArray()) {
+            throw new ParseException("Expected ArrayNode target for create call!");
+        }
+
+        // check correct object type
+        if (keys.get(0).isString() && !targetNode.isObject()) {
+            throw new ParseException("Expected ObjectNode target for create call!");
+        }
 
         // store a temporary reference
         JsonNode tmp = targetNode;
@@ -81,7 +94,7 @@ public class DotNotes {
             NotedKey key = keys.get(i);
 
             // figure out the next key, assuming there is one
-            NotedKey nextKey = i < j - 1 ? keys.get(i + 1) : null;
+            NotedKey nextKey = keys.get(i + 1);
 
             // store a MissingNode instance
             JsonNode local = MissingNode.getInstance();
@@ -100,14 +113,8 @@ public class DotNotes {
 
             // if we're dealing with a MissingNode
             if(local.isMissingNode()){
-                // check if we have a following key
-                if(nextKey != null){
-                    // set it to either an ObjectNode or an ArrayNode, based on the nextKey
-                    DotUtils.set(tmp, key, nextKey.isNumber() ? factory.arrayNode() : factory.objectNode());
-                } else {
-                    // otherwise spin up an empty ObjectNode
-                    DotUtils.set(tmp, key, factory.objectNode());
-                }
+                // set it to either an ObjectNode or an ArrayNode, based on the nextKey
+                DotUtils.set(tmp, key, nextKey.isNumber() ? factory.arrayNode() : factory.objectNode());
             }
 
             // if the key is a String
@@ -316,10 +323,8 @@ public class DotNotes {
                 p = d + 1;
             } else {
                 if (b > p) {
-                    // find the next brace
-                    char nb = s.charAt(b - 2);
                     // push up to the brace
-                    if (DotUtils.isQuote(nb)) {
+                    if (b - 2 > 0 && DotUtils.isQuote(s.charAt(b - 2))) {
                         keys.add(NotedKey.of(s.substring(p + 1, b - 2)));
                     } else {
                         keys.add(NotedKey.of(s.substring(p, b)));

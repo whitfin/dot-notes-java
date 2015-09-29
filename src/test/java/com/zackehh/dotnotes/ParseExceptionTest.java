@@ -1,10 +1,13 @@
 package com.zackehh.dotnotes;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.zackehh.dotnotes.util.ParseException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class ParseExceptionTest {
+
+    private final JsonNodeFactory factory = JsonNodeFactory.instance;
 
     @Test(expectedExceptions = ParseException.class)
     public void keyParsingThrowsErrorOnEmptyBraces() throws Exception {
@@ -91,6 +94,26 @@ public class ParseExceptionTest {
         } catch(ParseException e) {
             Assert.assertEquals(e.getMessage(), "Unable to parse character ']' at column 6! " +
                     "Did you remember to wrap brace keys in quotes?");
+            throw e;
+        }
+    }
+
+    @Test(expectedExceptions = ParseException.class)
+    public void keyCreateThrowsErrorInvalidArrayType() throws Exception {
+        try {
+            DotNotes.create("[0].test", factory.numberNode(5), factory.objectNode());
+        } catch(ParseException e) {
+            Assert.assertEquals(e.getMessage(), "Expected ArrayNode target for create call!");
+            throw e;
+        }
+    }
+
+    @Test(expectedExceptions = ParseException.class)
+    public void keyCreateThrowsErrorInvalidObjectType() throws Exception {
+        try {
+            DotNotes.create("test[0]", factory.numberNode(5), factory.arrayNode());
+        } catch(ParseException e) {
+            Assert.assertEquals(e.getMessage(), "Expected ObjectNode target for create call!");
             throw e;
         }
     }

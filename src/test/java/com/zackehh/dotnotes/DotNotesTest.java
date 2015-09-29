@@ -83,6 +83,19 @@ public class DotNotesTest {
     }
 
     @Test
+    public void parseStringUsingNegativeCharIndex() throws Exception {
+        JsonNode parsedObj = DotNotes.create("a[0]", factory.numberNode(5));
+
+        Assert.assertNotNull(parsedObj);
+        Assert.assertTrue(parsedObj.isObject());
+        Assert.assertTrue(parsedObj.has("a"));
+        Assert.assertTrue(parsedObj.get("a").isArray());
+        Assert.assertEquals(parsedObj.get("a").size(), 1);
+        Assert.assertTrue(parsedObj.get("a").get(0).isNumber());
+        Assert.assertEquals(parsedObj.get("a").get(0).asInt(), 5);
+    }
+
+    @Test
     public void parseStringIntoExistingObjectUsingCreate() throws Exception {
         ObjectNode oldObj = factory.objectNode();
 
@@ -104,6 +117,21 @@ public class DotNotesTest {
         Assert.assertTrue(parsedObj.get("this").get("is").get("a").get("party").isNumber());
         Assert.assertEquals(parsedObj.get("this").get("is").get("a").get("test").asInt(), 5);
         Assert.assertEquals(parsedObj.get("this").get("is").get("a").get("party").asInt(), 10);
+    }
+
+    @Test
+    public void parseStringIntoExistingObjectUsingCreateWithIntegerEnding() throws Exception {
+        JsonNode parsedObj = DotNotes.create("[0].test[0]", factory.numberNode(5));
+
+        Assert.assertNotNull(parsedObj);
+        Assert.assertTrue(parsedObj.isArray());
+        Assert.assertEquals(parsedObj.size(), 1);
+        Assert.assertTrue(parsedObj.get(0).isObject());
+        Assert.assertTrue(parsedObj.get(0).has("test"));
+        Assert.assertTrue(parsedObj.get(0).get("test").isArray());
+        Assert.assertEquals(parsedObj.get(0).get("test").size(), 1);
+        Assert.assertTrue(parsedObj.get(0).get("test").get(0).isNumber());
+        Assert.assertEquals(parsedObj.get(0).get("test").get(0).asInt(), 5);
     }
 
     @Test
