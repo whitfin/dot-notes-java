@@ -41,6 +41,20 @@ public class CreateTest {
     }
 
     @Test
+    public void createUsingBasicNestedKeyWithNumbers() throws Exception {
+        JsonNode parsedObj = DotNotes.create("test.test1", factory.numberNode(5));
+
+        assertNotNull(parsedObj);
+        assertTrue(parsedObj.isObject());
+        assertEquals(parsedObj.size(), 1);
+        assertTrue(parsedObj.has("test"));
+        assertTrue(parsedObj.get("test").isObject());
+        assertTrue(parsedObj.get("test").has("test1"));
+        assertTrue(parsedObj.get("test").get("test1").isNumber());
+        assertEquals(parsedObj.get("test").get("test1").asInt(), 5);
+    }
+
+    @Test
     public void createUsingArrayKey() throws Exception {
         JsonNode parsedArr = DotNotes.create("[0]", factory.numberNode(5));
 

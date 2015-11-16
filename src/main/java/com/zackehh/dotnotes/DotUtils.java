@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 class DotUtils {
 
     static final Pattern ACCESSOR
-            = Pattern.compile("^[a-zA-Z_$]+$");
+            = Pattern.compile("^[a-zA-Z_$][a-zA-Z0-9_$]*$");
     static final Pattern INDEX
             = Pattern.compile("^\\[([0-9]+)]$");
     static final Pattern OPENER
@@ -24,7 +24,7 @@ class DotUtils {
     static final Pattern PROPERTY
             = Pattern.compile("^\\[(?:'|\")(.+)(?:'|\")]$");
     static final Pattern SEGMENT
-            = Pattern.compile("^((?:[a-zA-Z_$]+)|(?:\\[(?:'.+?(?='])'|\".+?(?=\"])\")])|(?:\\[\\d+]))");
+            = Pattern.compile("^((?:[a-zA-Z_$][a-zA-Z0-9_$]*)|(?:\\[(?:'.+?(?='])'|\".+?(?=\"])\")])|(?:\\[\\d+]))");
 
     /**
      * This class is designed to be used statically - if someone manages
