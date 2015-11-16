@@ -3,7 +3,10 @@ package com.zackehh.dotnotes;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.zackehh.dotnotes.util.NotedKey;
+
+import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Small utility class for methods which shouldn't be accessible
@@ -11,6 +14,17 @@ import com.zackehh.dotnotes.util.NotedKey;
  * set of keys.
  */
 class DotUtils {
+
+    static final Pattern ACCESSOR
+            = Pattern.compile("^[a-zA-Z_$]+$");
+    static final Pattern INDEX
+            = Pattern.compile("^\\[([0-9]+)]$");
+    static final Pattern OPENER
+            = Pattern.compile("^(?:[0-9]|\"|')$");
+    static final Pattern PROPERTY
+            = Pattern.compile("^\\[(?:'|\")(.+)(?:'|\")]$");
+    static final Pattern SEGMENT
+            = Pattern.compile("^((?:[a-zA-Z_$]+)|(?:\\[(?:'.+?(?='])'|\".+?(?=\"])\")])|(?:\\[\\d+]))");
 
     /**
      * This class is designed to be used statically - if someone manages
@@ -22,14 +36,43 @@ class DotUtils {
     }
 
     /**
-     * Determines whether a provided char is a quote of some kind (either
-     * " or ').
+     * Simple shorthand to grab the first match of a Pattern/Matcher
+     * pair. Takes a String and a Pattern to compare against and returns
+     * the first matching group, NOT the first group available.
      *
-     * @param c the char to check
-     * @return true if the char is a quote
+     * @param s the String to match
+     * @param p the Pattern to match using
+     * @return the first matched group
      */
-    public static boolean isQuote(char c){
-        return c == '"' || c == '\'';
+    static String firstMatch(String s, Pattern p){
+        Matcher m = p.matcher(s);
+        return m.find() ? m.group(1) : null;
+    }
+
+    /**
+     * Shorthand on ${@link #matches(String, Pattern)} to accept a char
+     * rather than a complete String. This is here to ensure fastest conversion
+     * of char -> String.
+     *
+     * @param c the char to match
+     * @param p the Pattern to match using
+     * @return true if the char matches
+     */
+    static boolean matches(char c, Pattern p){
+        return matches(String.valueOf(c), p);
+    }
+
+    /**
+     * Shorthand to determine whether a provided String matches
+     * a provided Pattern. This is an alternative to ${@link java.lang.String#matches(String)}
+     * when the Regex is pre-compiled.
+     *
+     * @param s the String to match
+     * @param p the Pattern to match using
+     * @return true if the String matches
+     */
+    static boolean matches(String s, Pattern p){
+        return p.matcher(s).find();
     }
 
     /**
@@ -39,7 +82,7 @@ class DotUtils {
      * @param num the number to try and parse
      * @return an ${@link Integer} instance if possible, `null` if not
      */
-    public static Integer parseNum(String num){
+    static Integer parseNum(String num){
         return Integer.parseInt(num, 10);
     }
 
@@ -54,20 +97,68 @@ class DotUtils {
      * @param key the key to set in the node
      * @param value the value to set against the key
      */
-    public static void set(JsonNode node, NotedKey key, JsonNode value){
-        // determine if the key is a String
-        if(key.isString()){
+    static void set(JsonNode node, NotedKey key, JsonNode value){
+        if(key.isNumber()) {
+            ArrayNode arr = (ArrayNode) node;
 
-            // add the key and value to the object
+            int num = key.asNumber();
+
+            if(num == node.size()){
+                arr.add(value);
+            } else {
+                arr.set(num, value);
+            }
+        } else {
             ((ObjectNode) node).set(key.asString(), value);
         }
+    }
 
-        // determine if the key is a Number
-        if(key.isNumber()){
+    /**
+     * Finds a ${@link JsonNode} for the provided ${@link NotedKey}. The lookup
+     * changes based on whether the passed in key is a Number or a String.
+     *
+     * @param o the object to find a value inside
+     * @param k the key to use to find a value
+     * @return a found ${@link JsonNode} instance
+     */
+    static JsonNode findNode(JsonNode o, NotedKey k){
+        return k.isNumber() ? o.path(k.asNumber()) : o.path(k.asString());
+    }
 
-            // this is safe due to pre-processing
-            // noinspection ConstantConditions
-            ((ArrayNode) node).add(value);
+    /**
+     * A trivial implementation of iterating a ${@link JsonNode} without knowing what
+     * type of container is being used. If it's an ${@link ObjectNode}, we iterate using
+     * the field names, and if it's an ${@link ArrayNode} we iterate using a typical loop.
+     *
+     * Each key is emitted to a ${@link KeyHandler} for further processing.
+     *
+     * @param node the node to iterate
+     * @param iterator the callback to pass each key to
+     */
+    static void iterateNode(JsonNode node, KeyHandler iterator){
+        if(node.isObject()) {
+            Iterator<String> names = node.fieldNames();
+
+            while (names.hasNext()) {
+                iterator.execute(NotedKey.of(names.next()));
+            }
+        } else {
+            for(int i = 0, j = node.size(); i < j; i++){
+                iterator.execute(NotedKey.of(i));
+            }
         }
+    }
+
+    /**
+     * A small interface available to use against ${@link #iterateNode(JsonNode, KeyHandler)}.
+     */
+    interface KeyHandler {
+        /**
+         * This simply accepts a ${@link NotedKey} instance based on each key pair found during
+         * iteration.
+         *
+         * @param key the NotedKey to process
+         */
+        void execute(NotedKey key);
     }
 }

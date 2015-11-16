@@ -1,6 +1,5 @@
 package com.zackehh.dotnotes;
 
-import com.zackehh.dotnotes.util.NotedKey;
 import junit.framework.Assert;
 import org.testng.annotations.Test;
 
@@ -51,6 +50,29 @@ public class NotedKeyTest {
         Assert.assertEquals((int) numKey.asNumber(), 5);
 
         Assert.assertNull(NotedKey.of(Boolean.TRUE));
+    }
+
+    @Test
+    public void testToString() throws Exception {
+        NotedKey strKey = NotedKey.of("test");
+
+        Assert.assertNotNull(strKey);
+        Assert.assertTrue(strKey.isString());
+        Assert.assertFalse(strKey.isNumber());
+        Assert.assertNull(strKey.asNumber());
+        Assert.assertNotNull(strKey.asString());
+        Assert.assertEquals(strKey.asString(), "test");
+        Assert.assertEquals(strKey.toString(), "test");
+
+        NotedKey numKey = NotedKey.of(5);
+
+        Assert.assertNotNull(numKey);
+        Assert.assertFalse(numKey.isString());
+        Assert.assertTrue(numKey.isNumber());
+        Assert.assertNotNull(numKey.asNumber());
+        Assert.assertNull(numKey.asString());
+        Assert.assertEquals((int) numKey.asNumber(), 5);
+        Assert.assertEquals(numKey.asNumber().toString(), "5");
     }
 
     private <T> Constructor<NotedKey> getCtor(Class<T> tClass) throws NoSuchMethodException {

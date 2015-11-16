@@ -3,15 +3,12 @@ package com.zackehh.dotnotes;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.MissingNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.zackehh.dotnotes.util.NotedHandler;
-import com.zackehh.dotnotes.util.NotedKey;
-import com.zackehh.dotnotes.util.ParseException;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+
+import static com.zackehh.dotnotes.DotUtils.firstMatch;
+import static com.zackehh.dotnotes.DotUtils.matches;
 
 /**
  * The public access for DotNotes. This class allows for manipulation
@@ -64,104 +61,53 @@ public class DotNotes {
         // parse the path into a List of keys
         List<NotedKey> keys = keys(path);
 
-        // figure out the node we're creating into
-        JsonNode targetNode = target;
-
         // check null target
         if (target == null) {
-            targetNode = keys.get(0).isNumber()
-                    ? factory.arrayNode()
-                    : factory.objectNode();
+            target = keys.get(0).isNumber() ? factory.arrayNode() : factory.objectNode();
         }
 
         // check correct array type
-        if (keys.get(0).isNumber() && !targetNode.isArray()) {
+        if (keys.get(0).isNumber() && !target.isArray()) {
             throw new ParseException("Expected ArrayNode target for create call!");
         }
 
         // check correct object type
-        if (keys.get(0).isString() && !targetNode.isObject()) {
+        if (keys.get(0).isString() && !target.isObject()) {
             throw new ParseException("Expected ObjectNode target for create call!");
         }
 
         // store a temporary reference
-        JsonNode tmp = targetNode;
+        JsonNode tmp = target;
+
+        // grab length
+        int lastIndex = keys.size() - 1;
 
         // iterate through all keys (except the last)
-        for(int i = 0, j = keys.size() - 1; i < j; i++){
+        for(int i = 0; i < lastIndex; i++){
 
             // grab the current key
             NotedKey key = keys.get(i);
 
-            // figure out the next key, assuming there is one
-            NotedKey nextKey = keys.get(i + 1);
-
             // store a MissingNode instance
-            JsonNode local = MissingNode.getInstance();
-
-            // if the key is a String
-            if(key.isString()){
-                // we'll get from an ObjectNode
-                local = tmp.path(key.asString());
-            }
-
-            // if the key is a Number
-            if(key.isNumber()){
-                // we'll get from an ArrayNode
-                local = tmp.path(key.asNumber());
-            }
+            JsonNode local = DotUtils.findNode(tmp, key);
 
             // if we're dealing with a MissingNode
             if(local.isMissingNode()){
                 // set it to either an ObjectNode or an ArrayNode, based on the nextKey
-                DotUtils.set(tmp, key, nextKey.isNumber() ? factory.arrayNode() : factory.objectNode());
+                DotUtils.set(tmp, key, keys.get(i + 1).isNumber() ? factory.arrayNode() : factory.objectNode());
             }
 
-            // if the key is a String
-            if(key.isString()){
-                // nest into the ObjectNode
-                tmp = tmp.path(key.asString());
-            }
-
-            // if the key is a Number
-            if(key.isNumber()){
-                // nested into the ArrayNode
-                tmp = tmp.path(key.asNumber());
-            }
+            tmp = DotUtils.findNode(tmp, key);
         }
 
         // grab the last key to process
-        NotedKey endKey = keys.get(keys.size() - 1);
+        NotedKey endKey = keys.get(lastIndex);
 
         // set the value to the final key
         DotUtils.set(tmp, endKey, value);
 
         // return the target
-        return targetNode;
-    }
-
-    /**
-     * Flattens a ${@link JsonNode} down to a single level, using the ${@link DotCursor}
-     * to iterate through the keys, setting the paths as keys in an ${@link ObjectNode}.
-     *
-     * @param node the ${@link JsonNode} to flatten
-     * @return a flattened ${@link ObjectNode}
-     */
-    public static ObjectNode flatten(JsonNode node){
-        // create a node to use as a target
-        final ObjectNode targetNode = factory.objectNode();
-
-        // begin iteration through the keys
-        notedCursor(node, new NotedHandler() {
-            @Override
-            public void execute(String path, JsonNode value) {
-                // set the key in the target
-                targetNode.set(path, value);
-            }
-        });
-
-        // return the target
-        return targetNode;
+        return target;
     }
 
     /**
@@ -176,8 +122,10 @@ public class DotNotes {
      * @throws ParseException if any parsing issues occur
      */
     public static JsonNode get(String path, JsonNode node) throws ParseException {
-        // ensure that we have a valid JsonNode instance attached
-        node = node == null ? MissingNode.getInstance() : node;
+        // check for bad targets
+        if (node == null) {
+            return MissingNode.getInstance();
+        }
 
         // create a list of keys from the path
         List<NotedKey> keys = keys(path);
@@ -185,33 +133,21 @@ public class DotNotes {
         // store a cheap reference
         JsonNode tmp = node;
 
+        // grab length
+        int lastIndex = keys.size() - 1;
+
         // go through every key we have (except the last)
-        for(int i = 0, k = keys.size() - 1; i < k; i++){
-
-            // get the current key
-            NotedKey key = keys.get(i);
-
-            // if the key is a String
-            if(key.isString()){
-                // move into an ObjectNode
-                tmp = tmp.path(key.asString());
-            }
-
-            // if the key is a Number
-            if(key.isNumber()){
-                // move into an ArrayNode
-                tmp = tmp.path(key.asNumber());
-            }
-
+        for(int i = 0; i < lastIndex; i++){
+            tmp = DotUtils.findNode(tmp, keys.get(i));
             // if we've hit a dead end
-            if(tmp.isMissingNode()){
+            if(tmp.isMissingNode() || tmp.isNull()){
                 // short-circuit
-                return tmp;
+                return MissingNode.getInstance();
             }
         }
 
         // get the last key from the list
-        NotedKey key = keys.get(keys.size() - 1);
+        NotedKey key = keys.get(lastIndex);
 
         // if the key is a Number
         if(key.isNumber()){
@@ -224,48 +160,6 @@ public class DotNotes {
     }
 
     /**
-     * A wrapper to ${@link DotNotes#inflate(ObjectNode, ObjectNode)}, simply passing
-     * through parameters and appending `null` to the argument set. It's a shorthand for lazy
-     * programmers (myself included).
-     *
-     * @param node the ${@link JsonNode} to inflate
-     * @return an inflated ${@link JsonNode} instance
-     * @throws ParseException if any parsing issues occur
-     */
-    public static JsonNode inflate(ObjectNode node) throws ParseException {
-        return inflate(node, null);
-    }
-
-    /**
-     * Inflates an ${@link ObjectNode} which has been flattened previously, returning a
-     * ${@link JsonNode}. Uses ${@link DotNotes#create(String, JsonNode, JsonNode)} in order to
-     * take advantage of methods already available to us.
-     *
-     * @param node the node being inflated
-     * @param target a potential target object to inflate into
-     * @return an inflated ${@link JsonNode}
-     * @throws ParseException if any parsing issues occur
-     */
-    public static JsonNode inflate(ObjectNode node, ObjectNode target) throws ParseException {
-        // ensure we have a valid target node
-        target = target == null ? factory.objectNode() : target;
-
-        // get an Iterator to run through the single layer
-        Iterator<Map.Entry<String, JsonNode>> it = node.fields();
-
-        // iterate keys
-        while(it.hasNext()){
-            // get the next Map.Entry in the Iterator
-            Map.Entry<String, JsonNode> entry = it.next();
-            // call the create method, passing the key and value
-            create(entry.getKey(), entry.getValue(), target);
-        }
-
-        // return the inflated target
-        return target;
-    }
-
-    /**
      * Takes a dot-noted String and converts it to a List of keys. This method is by
      * no means perfect, however it's stable enough for most usage. A List of ${@link NotedKey}s
      * will be returned.
@@ -275,105 +169,219 @@ public class DotNotes {
      * @throws ParseException if any parsing issues occur
      */
     public static List<NotedKey> keys(String s) throws ParseException {
-        // output keys
-        List<NotedKey> keys = new ArrayList<>();
-
-        // position of search
-        int len = s.length(), p = 0;
-
-        // move through the string
-        while (p < len) {
-            // close brace
-            int c = s.indexOf(']', p);
-            // dot index
-            int d = s.indexOf(".", p);
-            // brace index
-            int b = s.indexOf("[", p);
-
-            // clean key, just add
-            if (d == -1 && b == -1 && !DotUtils.isQuote(s.charAt(p))) {
-                // the rest of the string is a key
-                keys.add(NotedKey.of(s.substring(p, len)));
-                // we're done
-                break;
-            } else if (b == -1 || (d != -1 && d < b)) {
-                // check valid key
-                if (s.charAt(d + 1) == '.') {
-                    // invalid == exception
-                    throw new ParseException(s.charAt(d + 1), d + 1, false);
-                }
-                // push up to the next dot
-                if (c == -1 || (d != -1 && d < c)) {
-                    keys.add(NotedKey.of(s.substring(p, d)));
-                } else {
-                    // check for dot or close
-                    if (d < c) {
-                        d = c + 1;
-                    }
-                    // check quotes
-                    if (DotUtils.isQuote(s.charAt(p))) {
-                        // push up to (not including) the quotes
-                        keys.add(NotedKey.of(s.substring(p + 1, d - 2)));
-                    } else {
-                        // put the index value
-                        keys.add(NotedKey.of(DotUtils.parseNum(s.substring(p, d - 1))));
-                    }
-                }
-                // start from the dot
-                p = d + 1;
-            } else {
-                if (b > p) {
-                    // push up to the brace
-                    if (b - 2 > 0 && DotUtils.isQuote(s.charAt(b - 2))) {
-                        keys.add(NotedKey.of(s.substring(p + 1, b - 2)));
-                    } else {
-                        keys.add(NotedKey.of(s.substring(p, b)));
-                    }
-                    // start from the brace
-                    p = b;
-                }
-                // fetch next char
-                char nc = s.charAt(b + 1);
-                // check for quotes
-                if (!DotUtils.isQuote(nc)){
-                    // find the end of the brace
-                    c = s.indexOf(']', b);
-                    // check invalid sub-strings
-                    if (c < 0 || c == b + 1 || !s.substring(b + 1, c).matches("^\\d+$")){
-                        throw new ParseException(nc, b + 1, true);
-                    }
-                    // push the index key found up until the brace
-                    keys.add(NotedKey.of(DotUtils.parseNum(s.substring(b + 1, c))));
-                    // shift the position to the next section
-                    p = c + 2;
-                } else {
-                    // check for end of the quotes
-                    c = s.indexOf(s.charAt(b + 1) + "]", b);
-                    // uh oh
-                    if (c == -1) {
-                        throw new ParseException("Unable to find matching quote at column " + (b + 1) + "!");
-                    }
-                    // push key until the next point
-                    keys.add(NotedKey.of(s.substring(p + 2, c)));
-                    // move to the start of the next key
-                    p = c + (len > c + 2 && s.charAt(c + 2) == '.' ? 3 : 2);
-                }
-            }
+        // short-circuit if needed
+        if(s == null || s.length() == 0){
+            throw new ParseException("Unable to parse empty string!");
         }
 
-        // return the key list
+        // cursor in String
+        int position = 0;
+
+        // key list to build into
+        List<NotedKey> keys = new ArrayList<>();
+
+        // clone input
+        String input = s;
+
+        // process all input
+        while(input.length() > 0){
+            // try to grab a match
+            String prop = DotUtils.firstMatch(input, DotUtils.SEGMENT);
+
+            // exit if no match
+            if(prop == null){
+                throw new ParseException(input.charAt(0), position);
+            }
+
+            NotedKey val;
+
+            // check accessor
+            if(matches(prop, DotUtils.ACCESSOR)){
+                // create key
+                val = NotedKey.of(prop);
+            }
+            // check index
+            else if (matches(prop, DotUtils.INDEX)) {
+                // create key of parsed index
+                val = NotedKey.of(DotUtils.parseNum(firstMatch(prop, DotUtils.INDEX)));
+            }
+            // check prop
+            else {
+                // create key based on prop match
+                val = NotedKey.of(firstMatch(prop, DotUtils.PROPERTY));
+            }
+
+            // add the key
+            keys.add(val);
+
+            // useful lengths
+            int inputLen = input.length();
+            int propLen = prop.length();
+
+            // store remaining String
+            String remainder;
+
+            // if we're done, init to empty
+            if (inputLen == propLen) {
+                remainder = "";
+            } else {
+                // trim remainder
+                remainder = input.substring(propLen);
+                // check following char
+                boolean isDot = remainder.charAt(0) == '.';
+                // check trailing special char
+                if(remainder.length() > 1){
+                    // check following char
+                    char nextChar = remainder.charAt(1);
+                    // exit if invalid char
+                    if (!matches(nextChar, isDot ? DotUtils.ACCESSOR : DotUtils.OPENER)) {
+                        throw new ParseException(nextChar, position + propLen + 1);
+                    }
+                } else {
+                    // throw exception on trailing special char
+                    throw new ParseException("Unable to parse key with trailing " +
+                            (isDot ? "dot" : "bracket") + "!");
+                }
+
+                // trim trailing dots
+                if (isDot) {
+                    remainder = remainder.substring(1);
+                }
+            }
+
+            // shift the cursor
+            position += (inputLen - remainder.length());
+            // swap the input
+            input = remainder;
+        }
+
+        // return the keys list
         return keys;
     }
 
     /**
-     * Passes the ${@link JsonNode} parameter and ${@link NotedHandler} to the
-     * ${@link DotCursor#recurse(JsonNode, NotedHandler, String)} method to do
-     * the heavy lifting. This method simply surfaces it to the outside world.
+     * A small wrapper to ${@link #recurse(JsonNode, NodeIterator, String)} to allow omitting
+     * a third parameter, passing null instead.
+     *
+     * @param node the node to pass
+     * @param handler the handler to pass
+     */
+    public static void recurse(JsonNode node, NodeIterator handler) {
+        recurse(node, handler, null);
+    }
+
+    /**
+     * Moves through the provided JsonNode, emitting values to the ${@link NodeIterator#execute(NotedKey, JsonNode, String)}
+     * method of a provided handler. A prefix can be provided in order to start all paths with a custom prefix. Paths will
+     * not be generated if ${@link NodeIterator#requirePathGeneration()} returns false.
      *
      * @param node the node to iterate through
-     * @param handler the handler to use for processing
+     * @param handler the handler to emit to
+     * @param start the starting prefix String, if any
      */
-    public static void notedCursor(JsonNode node, NotedHandler handler){
-        DotCursor.recurse(node, handler, null);
+    public static void recurse(final JsonNode node, final NodeIterator handler, String start){
+        // ensure this is a valid container node
+        if(!node.isContainerNode()){
+            throw new IllegalArgumentException("Non-object provided to `recurse`!");
+        }
+
+        // prefixes should default
+        if (start == null) {
+            start = "";
+        }
+
+        // detect array usage
+        final boolean isArr = node.isArray();
+        final String prefix = start;
+
+        // iterate through every key in this nest, using iterateNode
+        DotUtils.iterateNode(node, new DotUtils.KeyHandler() {
+            @Override
+            public void execute(NotedKey key) {
+                // grab both values of the keys
+                String kStr = key.asString();
+                Integer kNum = key.asNumber();
+
+                // create a StringBuilder
+                StringBuilder keystr = new StringBuilder("");
+
+                // if we're making paths
+                if (handler.requirePathGeneration()) {
+                    // add the prefix
+                    keystr.append(prefix);
+
+                    // detect arrays
+                    if(isArr){
+                        // add the integer index
+                        keystr.append("[").append(kNum).append("]");
+                    }
+                    // detect special strings
+                    else if (!matches(kStr, DotUtils.ACCESSOR)) {
+                        // add starting bracket
+                        keystr.append("[\"");
+
+                        // ensure escaped quotes
+                        if (kStr.contains("\"")) {
+                            keystr.append(kStr.replace("\"", "\\\""));
+                        } else {
+                            keystr.append(kStr);
+                        }
+
+                        // add closing bracket
+                        keystr.append("\"]");
+                    }
+                    // default
+                    else {
+                        // add a dot if it's not the first key
+                        if(prefix.length() > 0){
+                            keystr.append(".");
+                        }
+                        // add the entire string
+                        keystr.append(kStr);
+                    }
+                }
+
+                // grab next level down
+                JsonNode next = DotUtils.findNode(node, key);
+
+                // check for container, another nest
+                if (next.isContainerNode()) {
+                    // call again using nest
+                    recurse(next, handler, keystr.toString());
+                    return;
+                }
+
+                // emit to the handler
+                handler.execute(key, next, keystr.toString());
+            }
+        });
+    }
+
+    /**
+     * A very small interface used for processing the iteration
+     * through a set of path and key tuples. Used alongside the
+     * cursor class.
+     */
+    abstract public static class NodeIterator {
+
+        /**
+         * Receives a string path (in dot notation), and feeds in
+         * the value associated (assuming it's not a missing value).
+         *
+         * @param path the String path to the key
+         * @param value the JsonNode associated
+         */
+        abstract protected void execute(NotedKey key, JsonNode value, String path);
+
+        /**
+         * If the path is not being used, forcing this method to return
+         * false will disable path generation, allowing for a faster recursion.
+         *
+         * @return true if paths should be generated
+         */
+        protected boolean requirePathGeneration() {
+            return true;
+        }
+
     }
 }

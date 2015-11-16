@@ -7,11 +7,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
-public class DotNotesTest {
+public class DotUtilsTest {
 
     @Test(expectedExceptions = InvocationTargetException.class)
-    public void creationOfDotNotesDisabled() throws Exception {
-        Constructor<DotNotes> constructor = DotNotes.class.getDeclaredConstructor();
+    public void creationOfDotUtilsDisabled() throws Exception {
+        Constructor<DotUtils> constructor = DotUtils.class.getDeclaredConstructor();
         Assert.assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);
         constructor.newInstance();

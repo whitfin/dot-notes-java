@@ -1,4 +1,4 @@
-package com.zackehh.dotnotes.util;
+package com.zackehh.dotnotes;
 
 /**
  * Small Exception class for use with parsing errors
@@ -27,11 +27,9 @@ public class ParseException extends Exception {
      *
      * @param current the current character being processed
      * @param index the index of the current character
-     * @param brace whether we're trying to process a brace
      */
-    public ParseException(char current, int index, boolean brace){
-        this("Unable to parse character '" + current + "' at column " + (index + 1) +
-             "!" + (brace ? " Did you remember to wrap brace keys in quotes?" : ""));
+    public ParseException(char current, int index){
+        this("Unable to parse key starting with \'" + current + "\' at column " + (index + 1) + "!");
     }
 
 }

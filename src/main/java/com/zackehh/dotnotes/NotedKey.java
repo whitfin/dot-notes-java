@@ -1,4 +1,4 @@
-package com.zackehh.dotnotes.util;
+package com.zackehh.dotnotes;
 
 /**
  * A wrapping class for a potential key - keys
