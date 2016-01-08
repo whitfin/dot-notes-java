@@ -18,6 +18,7 @@
     <properties>
         <jackson2.version>2.5.2</jackson2.version>
         <jacoco.version>0.7.5.201505241946</jacoco.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <developers>
