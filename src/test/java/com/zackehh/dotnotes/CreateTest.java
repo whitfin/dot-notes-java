@@ -16,7 +16,7 @@ public class CreateTest {
 
     @Test
     public void createUsingBasicKey() throws Exception {
-        JsonNode parsedObj = DotNotes.create("test", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "test", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -28,7 +28,7 @@ public class CreateTest {
 
     @Test
     public void createUsingBasicNestedKey() throws Exception {
-        JsonNode parsedObj = DotNotes.create("test.test", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "test.test", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -42,7 +42,7 @@ public class CreateTest {
 
     @Test
     public void createUsingBasicNestedKeyWithNumbers() throws Exception {
-        JsonNode parsedObj = DotNotes.create("test.test1", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "test.test1", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -56,7 +56,7 @@ public class CreateTest {
 
     @Test
     public void createUsingArrayKey() throws Exception {
-        JsonNode parsedArr = DotNotes.create("[0]", factory.numberNode(5));
+        JsonNode parsedArr = DotNotes.create(null, "[0]", factory.numberNode(5));
 
         assertNotNull(parsedArr);
         assertTrue(parsedArr.isArray());
@@ -67,7 +67,7 @@ public class CreateTest {
 
     @Test
     public void createUsingNestedArrayKey() throws Exception {
-        JsonNode parsedArr = DotNotes.create("[0][0]", factory.numberNode(5));
+        JsonNode parsedArr = DotNotes.create(null, "[0][0]", factory.numberNode(5));
 
         assertNotNull(parsedArr);
         assertTrue(parsedArr.isArray());
@@ -86,7 +86,7 @@ public class CreateTest {
         arrayNode.add(10);
         arrayNode.add(10);
 
-        JsonNode parsedArr = DotNotes.create("[1]", factory.numberNode(5), arrayNode);
+        JsonNode parsedArr = DotNotes.create(arrayNode, "[1]", factory.numberNode(5));
 
         assertNotNull(parsedArr);
         assertTrue(parsedArr.isArray());
@@ -101,7 +101,7 @@ public class CreateTest {
 
     @Test
     public void createUsingBasicKeyUnderAnArrayKey() throws Exception {
-        JsonNode parsedArr = DotNotes.create("[0].test", factory.numberNode(5));
+        JsonNode parsedArr = DotNotes.create(null, "[0].test", factory.numberNode(5));
 
         assertNotNull(parsedArr);
         assertTrue(parsedArr.isArray());
@@ -115,7 +115,7 @@ public class CreateTest {
 
     @Test
     public void createUsingArrayKeyUnderABasicKey() throws Exception {
-        JsonNode parsedObj = DotNotes.create("test[0]", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "test[0]", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -129,7 +129,7 @@ public class CreateTest {
 
     @Test
     public void createUsingCompoundKeyUsingSingleQuotes() throws Exception {
-        JsonNode parsedObj = DotNotes.create("['test']", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "['test']", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -141,7 +141,7 @@ public class CreateTest {
 
     @Test
     public void createUsingCompoundKeyUsingDoubleQuotes() throws Exception {
-        JsonNode parsedObj = DotNotes.create("[\"test\"]", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "[\"test\"]", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -153,7 +153,7 @@ public class CreateTest {
 
     @Test
     public void createUsingBasicKeyUnderCompoundKeyUsingSingleQuotes() throws Exception {
-        JsonNode parsedObj = DotNotes.create("['test'].test", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "['test'].test", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -168,7 +168,7 @@ public class CreateTest {
 
     @Test
     public void createUsingBasicKeyUnderCompoundKeyUsingDoubleQuotes() throws Exception {
-        JsonNode parsedObj = DotNotes.create("[\"test\"].test", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "[\"test\"].test", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -183,7 +183,7 @@ public class CreateTest {
 
     @Test
     public void createUsingArrayKeyUnderCompoundKeyUsingSingleQuotes() throws Exception {
-        JsonNode parsedObj = DotNotes.create("['test'][0]", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "['test'][0]", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -197,7 +197,7 @@ public class CreateTest {
 
     @Test
     public void createUsingArrayKeyUnderCompoundKeyUsingDoubleQuotes() throws Exception {
-        JsonNode parsedObj = DotNotes.create("[\"test\"][0]", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "[\"test\"][0]", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -211,7 +211,7 @@ public class CreateTest {
 
     @Test
     public void createUsingIntegerKeyUsingSingleQuotes() throws Exception {
-        JsonNode parsedObj = DotNotes.create("['10']", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "['10']", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -223,7 +223,7 @@ public class CreateTest {
 
     @Test
     public void createUsingIntegerKeyUsingDoubleQuotes() throws Exception {
-        JsonNode parsedObj = DotNotes.create("[\"10\"]", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "[\"10\"]", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -235,7 +235,7 @@ public class CreateTest {
 
     @Test
     public void createUsingSpecialKeyUsingSingleQuotes() throws Exception {
-        JsonNode parsedObj = DotNotes.create("[']]][[[']", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "[']]][[[']", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -247,7 +247,7 @@ public class CreateTest {
 
     @Test
     public void createUsingSpecialKeyUsingDoubleQuotes() throws Exception {
-        JsonNode parsedObj = DotNotes.create("[\"]]][[[\"]", factory.numberNode(5));
+        JsonNode parsedObj = DotNotes.create(null, "[\"]]][[[\"]", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -263,7 +263,7 @@ public class CreateTest {
 
         objectNode.put("sing", 10);
 
-        JsonNode parsedObj = DotNotes.create("dance", factory.numberNode(5), objectNode);
+        JsonNode parsedObj = DotNotes.create(objectNode, "dance", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -282,7 +282,7 @@ public class CreateTest {
 
         objectNode.put("dance", 10);
 
-        JsonNode parsedObj = DotNotes.create("dance", factory.numberNode(5), objectNode);
+        JsonNode parsedObj = DotNotes.create(objectNode, "dance", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -298,7 +298,7 @@ public class CreateTest {
 
         objectNode.with("dance").put("dance", 10);
 
-        JsonNode parsedObj = DotNotes.create("dance.dance", factory.numberNode(5), objectNode);
+        JsonNode parsedObj = DotNotes.create(objectNode, "dance.dance", factory.numberNode(5));
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -312,7 +312,7 @@ public class CreateTest {
 
     @Test
     public void createUsingNullValue() throws Exception {
-        JsonNode parsedObj = DotNotes.create("dance", null);
+        JsonNode parsedObj = DotNotes.create(null, "dance", null);
 
         assertNotNull(parsedObj);
         assertTrue(parsedObj.isObject());
@@ -321,23 +321,23 @@ public class CreateTest {
         assertTrue(parsedObj.get("dance").isNull());
     }
 
-    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse key starting with '1' at column 1!")
+    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse '123' at character '1', column 1!")
     public void throwErrorWhenProvidedInvalidKey() throws Exception {
-        DotNotes.create("123", factory.numberNode(5));
+        DotNotes.create(null, "123", factory.numberNode(5));
     }
 
     @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse empty string!")
     public void throwErrorWhenProvidedNullKey() throws Exception {
-        DotNotes.create(null, factory.numberNode(5));
+        DotNotes.create(null, null, factory.numberNode(5));
     }
 
     @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Expected ArrayNode target for create call!")
     public void throwErrorAgainstInvalidObjectTarget() throws Exception {
-        DotNotes.create("[0]", factory.numberNode(5), factory.objectNode());
+        DotNotes.create(factory.objectNode(), "[0]", factory.numberNode(5));
     }
 
     @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Expected ObjectNode target for create call!")
     public void throwErrorAgainstInvalidArrayTarget() throws Exception {
-        DotNotes.create("test", factory.numberNode(5), factory.arrayNode());
+        DotNotes.create(factory.arrayNode(), "test", factory.numberNode(5));
     }
 }

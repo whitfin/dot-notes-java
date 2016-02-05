@@ -292,22 +292,22 @@ public class KeysTest {
         DotNotes.keys("");
     }
 
-    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse key starting with '1' at column 6!")
+    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse 'test.1' at character '1', column 6!")
     public void throwErrorWhenProvidedInvalidKey() throws Exception {
         DotNotes.keys("test.1");
     }
 
-    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse key starting with '\\[' at column 6!")
+    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse 'test.\\['test']' at character '\\[', column 6!")
     public void throwErrorWhenProvidedInvalidBracketNotation() throws Exception {
         DotNotes.keys("test.['test']");
     }
 
-    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse key starting with '\\[' at column 6!")
+    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse 'test.\\[0]' at character '\\[', column 6!")
     public void throwErrorWhenProvidedInvalidArrayNotation() throws Exception {
         DotNotes.keys("test.[0]");
     }
 
-    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse key starting with 't' at column 6!")
+    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse 'test\\[test]' at character 't', column 6!")
     public void throwErrorWhenProvidedInvalidArrayIndexNotation() throws Exception {
         DotNotes.keys("test[test]");
     }
@@ -322,12 +322,12 @@ public class KeysTest {
         DotNotes.keys("test[");
     }
 
-    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse key starting with '\\[' at column 1!")
+    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse '\\['test]' at character '\\[', column 1!")
     public void throwErrorWhenProvidedUnmatchedQuotes() throws Exception {
         DotNotes.keys("['test]");
     }
 
-    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse key starting with '\\.' at column 6!")
+    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse 'test..test' at character '.', column 6!")
     public void throwErrorWhenProvidedSequentialDots() throws Exception {
         DotNotes.keys("test..test");
     }

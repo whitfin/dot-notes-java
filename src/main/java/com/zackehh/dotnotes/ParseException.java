@@ -28,8 +28,8 @@ public class ParseException extends Exception {
      * @param current the current character being processed
      * @param index the index of the current character
      */
-    public ParseException(char current, int index){
-        this("Unable to parse key starting with \'" + current + "\' at column " + (index + 1) + "!");
+    public ParseException(String key, char current, int index){
+        this("Unable to parse '" + key + "' at character '" + current + "', column " + (index + 1) + "!");
     }
 
 }

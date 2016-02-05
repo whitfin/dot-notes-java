@@ -25,6 +25,8 @@ class DotUtils {
             = Pattern.compile("^\\[(?:'|\")(.+)(?:'|\")]$");
     static final Pattern SEGMENT
             = Pattern.compile("^((?:[a-zA-Z_$][a-zA-Z0-9_$]*)|(?:\\[(?:'.+?(?='])'|\".+?(?=\"])\")])|(?:\\[\\d+]))");
+    static final Pattern KEY
+            = Pattern.compile(SEGMENT.toString() + "$");
 
     /**
      * This class is designed to be used statically - if someone manages
@@ -135,7 +137,7 @@ class DotUtils {
      * @param node the node to iterate
      * @param iterator the callback to pass each key to
      */
-    static void iterateNode(JsonNode node, KeyHandler iterator){
+    static void iterateNode(JsonNode node, KeyHandler iterator) throws ParseException {
         if(node.isObject()) {
             Iterator<String> names = node.fieldNames();
 
@@ -159,6 +161,6 @@ class DotUtils {
          *
          * @param key the NotedKey to process
          */
-        void execute(NotedKey key);
+        void execute(NotedKey key) throws ParseException;
     }
 }

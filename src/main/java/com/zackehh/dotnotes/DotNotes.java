@@ -28,22 +28,8 @@ public class DotNotes {
      * to get at it with Reflection, throw an Exception so they stop being
      * stupid.
      */
-    private DotNotes(){
+    private DotNotes() {
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     * A wrapper to ${@link DotNotes#create(String, JsonNode, JsonNode)}, simply passing
-     * through parameters and appending `null` to the argument set. It's a shorthand for lazy
-     * programmers (myself included).
-     *
-     * @param path the path to create
-     * @param value the value to set the path to
-     * @return the ${@link JsonNode} after key creation
-     * @throws ParseException if any parsing issues occur
-     */
-    public static JsonNode create(String path, JsonNode value) throws ParseException {
-        return create(path, value, null);
     }
 
     /**
@@ -51,28 +37,31 @@ public class DotNotes {
      * This can either create a new ${@link JsonNode} from scratch, or be used to populate
      * a pre-existing one.
      *
+     * @param target the target ${@link JsonNode} to create into
      * @param path the path to create
      * @param value the value to set the path to
-     * @param target the target ${@link JsonNode} to create into
      * @return the ${@link JsonNode} after key creation
      * @throws ParseException if any parsing issues occur
      */
-    public static JsonNode create(String path, JsonNode value, JsonNode target) throws ParseException {
+    public static JsonNode create(JsonNode target, String path, JsonNode value) throws ParseException {
         // parse the path into a List of keys
         List<NotedKey> keys = keys(path);
 
+        // grab first key
+        NotedKey first = keys.get(0);
+
         // check null target
         if (target == null) {
-            target = keys.get(0).isNumber() ? factory.arrayNode() : factory.objectNode();
+            target = first.isNumber() ? factory.arrayNode() : factory.objectNode();
         }
 
         // check correct array type
-        if (keys.get(0).isNumber() && !target.isArray()) {
+        if (first.isNumber() && !target.isArray()) {
             throw new ParseException("Expected ArrayNode target for create call!");
         }
 
         // check correct object type
-        if (keys.get(0).isString() && !target.isObject()) {
+        if (first.isString() && !target.isObject()) {
             throw new ParseException("Expected ObjectNode target for create call!");
         }
 
@@ -83,7 +72,7 @@ public class DotNotes {
         int lastIndex = keys.size() - 1;
 
         // iterate through all keys (except the last)
-        for(int i = 0; i < lastIndex; i++){
+        for(int i = 0; i < lastIndex; i++) {
 
             // grab the current key
             NotedKey key = keys.get(i);
@@ -92,7 +81,7 @@ public class DotNotes {
             JsonNode local = DotUtils.findNode(tmp, key);
 
             // if we're dealing with a MissingNode
-            if(local.isMissingNode()){
+            if (local.isMissingNode()) {
                 // set it to either an ObjectNode or an ArrayNode, based on the nextKey
                 DotUtils.set(tmp, key, keys.get(i + 1).isNumber() ? factory.arrayNode() : factory.objectNode());
             }
@@ -111,17 +100,78 @@ public class DotNotes {
     }
 
     /**
+     * Escapes a key input, to ensure that the returned String is a valid
+     * key format. This must take a ${@link NotedKey} instance in order to
+     * enforce Array vs Object typing.
+     *
+     * @param key the key to escape
+     * @return a ${@link String} with valid escaping
+     * @throws ParseException
+     */
+    public static String escape(NotedKey key) throws ParseException {
+        // check null key
+        if (key == null) {
+            throw new ParseException("Unexpected non-string value provided!");
+        }
+
+        // quick number checking
+        if (key.isNumber()) {
+            return "[" + key.asNumber() + "]";
+        }
+
+        // store key as a String
+        String input = key.asString();
+
+        // if empty, error
+        if (input.isEmpty()) {
+            throw new ParseException("Unable to escape empty string!");
+        }
+
+        // if it's not an accessor, return special key form
+        if (!DotUtils.matches(input, DotUtils.ACCESSOR)) {
+            return "[\"" + input.replace("\"", "\\\"") + "\"]";
+        }
+
+        // return default
+        return input;
+    }
+
+    /**
+     * Wrapper to ${@link #escape(NotedKey)} in order to allow easy passing
+     * of a Number value without having to manually force into a NotedKey.
+     *
+     * @param num the number to pass
+     * @return the escaped String
+     * @throws ParseException
+     */
+    public static String escape(Number num) throws ParseException {
+        return escape(NotedKey.of(num));
+    }
+
+    /**
+     * Wrapper to ${@link #escape(NotedKey)} in order to allow easy passing
+     * of a String value without having to manually force into a NotedKey.
+     *
+     * @param str the String to pass
+     * @return the escaped String
+     * @throws ParseException
+     */
+    public static String escape(String str) throws ParseException {
+        return escape(NotedKey.of(str));
+    }
+
+    /**
      * Uses a String path to create a List of keys in order to move
      * through a nested ${@link JsonNode} in order to find a specific
      * value. If the value is found, it is returned. If it can not be
      * found, a ${@link MissingNode} will be returned.
      *
-     * @param path the path to find the value for
      * @param node the node to use for the search
+     * @param path the path to find the value for
      * @return a ${@link JsonNode} if found, a ${@link MissingNode} if not
      * @throws ParseException if any parsing issues occur
      */
-    public static JsonNode get(String path, JsonNode node) throws ParseException {
+    public static JsonNode get(JsonNode node, String path) throws ParseException {
         // check for bad targets
         if (node == null) {
             return MissingNode.getInstance();
@@ -137,10 +187,10 @@ public class DotNotes {
         int lastIndex = keys.size() - 1;
 
         // go through every key we have (except the last)
-        for(int i = 0; i < lastIndex; i++){
+        for(int i = 0; i < lastIndex; i++) {
             tmp = DotUtils.findNode(tmp, keys.get(i));
             // if we've hit a dead end
-            if(tmp.isMissingNode() || tmp.isNull()){
+            if (tmp.isMissingNode() || tmp.isNull()) {
                 // short-circuit
                 return MissingNode.getInstance();
             }
@@ -150,13 +200,25 @@ public class DotNotes {
         NotedKey key = keys.get(lastIndex);
 
         // if the key is a Number
-        if(key.isNumber()){
+        if (key.isNumber()) {
             // return the ArrayNode index
             return tmp.path(key.asNumber());
         }
 
         // return the ObjectNode value
         return tmp.path(key.asString());
+    }
+
+    /**
+     * Determines whether a String is already in an escaped format. Returns
+     * true if this is the case. This does not validate dot notation, but
+     * rather it validates a single key.
+     *
+     * @param key the key to validate
+     * @return true if the key is escaped correctly
+     */
+    public static boolean isEscaped(String key) {
+        return key != null && DotUtils.matches(key, DotUtils.KEY);
     }
 
     /**
@@ -170,7 +232,7 @@ public class DotNotes {
      */
     public static List<NotedKey> keys(String s) throws ParseException {
         // short-circuit if needed
-        if(s == null || s.length() == 0){
+        if (s == null || s.isEmpty()) {
             throw new ParseException("Unable to parse empty string!");
         }
 
@@ -184,19 +246,19 @@ public class DotNotes {
         String input = s;
 
         // process all input
-        while(input.length() > 0){
+        while (!input.isEmpty()) {
             // try to grab a match
             String prop = DotUtils.firstMatch(input, DotUtils.SEGMENT);
 
             // exit if no match
-            if(prop == null){
-                throw new ParseException(input.charAt(0), position);
+            if (prop == null) {
+                throw new ParseException(input, input.charAt(0), position);
             }
 
             NotedKey val;
 
             // check accessor
-            if(matches(prop, DotUtils.ACCESSOR)){
+            if (matches(prop, DotUtils.ACCESSOR)) {
                 // create key
                 val = NotedKey.of(prop);
             }
@@ -230,12 +292,12 @@ public class DotNotes {
                 // check following char
                 boolean isDot = remainder.charAt(0) == '.';
                 // check trailing special char
-                if(remainder.length() > 1){
+                if (remainder.length() > 1) {
                     // check following char
                     char nextChar = remainder.charAt(1);
                     // exit if invalid char
                     if (!matches(nextChar, isDot ? DotUtils.ACCESSOR : DotUtils.OPENER)) {
-                        throw new ParseException(nextChar, position + propLen + 1);
+                        throw new ParseException(input, nextChar, position + propLen + 1);
                     }
                 } else {
                     // throw exception on trailing special char
@@ -266,7 +328,7 @@ public class DotNotes {
      * @param node the node to pass
      * @param handler the handler to pass
      */
-    public static void recurse(JsonNode node, NodeIterator handler) {
+    public static void recurse(JsonNode node, NodeIterator handler) throws ParseException {
         recurse(node, handler, null);
     }
 
@@ -279,9 +341,9 @@ public class DotNotes {
      * @param handler the handler to emit to
      * @param start the starting prefix String, if any
      */
-    public static void recurse(final JsonNode node, final NodeIterator handler, String start){
+    public static void recurse(final JsonNode node, final NodeIterator handler, String start) throws ParseException {
         // ensure this is a valid container node
-        if(!node.isContainerNode()){
+        if (!node.isContainerNode()) {
             throw new IllegalArgumentException("Non-object provided to `recurse`!");
         }
 
@@ -291,54 +353,30 @@ public class DotNotes {
         }
 
         // detect array usage
-        final boolean isArr = node.isArray();
         final String prefix = start;
 
         // iterate through every key in this nest, using iterateNode
         DotUtils.iterateNode(node, new DotUtils.KeyHandler() {
             @Override
-            public void execute(NotedKey key) {
-                // grab both values of the keys
-                String kStr = key.asString();
-                Integer kNum = key.asNumber();
-
+            public void execute(NotedKey key) throws ParseException {
                 // create a StringBuilder
-                StringBuilder keystr = new StringBuilder("");
+                StringBuilder keystr = new StringBuilder(prefix);
 
                 // if we're making paths
                 if (handler.requirePathGeneration()) {
-                    // add the prefix
-                    keystr.append(prefix);
 
-                    // detect arrays
-                    if(isArr){
-                        // add the integer index
-                        keystr.append("[").append(kNum).append("]");
-                    }
-                    // detect special strings
-                    else if (!matches(kStr, DotUtils.ACCESSOR)) {
-                        // add starting bracket
-                        keystr.append("[\"");
+                    // escape the key
+                    String escaped = escape(key);
 
-                        // ensure escaped quotes
-                        if (kStr.contains("\"")) {
-                            keystr.append(kStr.replace("\"", "\\\""));
-                        } else {
-                            keystr.append(kStr);
-                        }
-
-                        // add closing bracket
-                        keystr.append("\"]");
-                    }
-                    // default
-                    else {
-                        // add a dot if it's not the first key
-                        if(prefix.length() > 0){
+                    // check for a prefix
+                    if (prefix.length() > 0) {
+                        if (escaped.charAt(0) != '[') {
                             keystr.append(".");
                         }
-                        // add the entire string
-                        keystr.append(kStr);
                     }
+
+                    // append the key
+                    keystr.append(escaped);
                 }
 
                 // grab next level down

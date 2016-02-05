@@ -32,9 +32,7 @@ If you wish to contribute (awesome!), please file an issue in the main dot-notes
 
 ### Testing
 
-Tests are run using `mvn`. I aim to maintain 100% coverage where possible (both line and branch).
-
-Tests can be run as follows:
+Tests are run using Maven. I aim to maintain 100% coverage where possible (both line and branch). These tests can be run as follows:
 
 ```bash
 $ mvn clean verify

@@ -21,7 +21,7 @@ public class GetTest {
 
         objectNode.put("test", 5);
 
-        JsonNode value = DotNotes.get("test", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "test");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -34,7 +34,7 @@ public class GetTest {
 
         objectNode.with("test").put("test", 5);
 
-        JsonNode value = DotNotes.get("test.test", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "test.test");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -47,7 +47,7 @@ public class GetTest {
 
         arrayNode.add(5);
 
-        JsonNode value = DotNotes.get("[0]", arrayNode);
+        JsonNode value = DotNotes.get(arrayNode, "[0]");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -62,7 +62,7 @@ public class GetTest {
         innerNode.add(5);
         arrayNode.add(innerNode);
 
-        JsonNode value = DotNotes.get("[0][0]", arrayNode);
+        JsonNode value = DotNotes.get(arrayNode, "[0][0]");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -77,7 +77,7 @@ public class GetTest {
         objectNode.put("test", 5);
         arrayNode.add(objectNode);
 
-        JsonNode value = DotNotes.get("[0].test", arrayNode);
+        JsonNode value = DotNotes.get(arrayNode, "[0].test");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -90,7 +90,7 @@ public class GetTest {
 
         objectNode.withArray("test").add(5);
 
-        JsonNode value = DotNotes.get("test[0]", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "test[0]");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -103,7 +103,7 @@ public class GetTest {
 
         objectNode.put("test", 5);
 
-        JsonNode value = DotNotes.get("['test']", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "['test']");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -116,7 +116,7 @@ public class GetTest {
 
         objectNode.put("test", 5);
 
-        JsonNode value = DotNotes.get("[\"test\"]", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "[\"test\"]");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -129,7 +129,7 @@ public class GetTest {
 
         objectNode.with("test").put("test", 5);
 
-        JsonNode value = DotNotes.get("['test'].test", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "['test'].test");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -142,7 +142,7 @@ public class GetTest {
 
         objectNode.with("test").put("test", 5);
 
-        JsonNode value = DotNotes.get("[\"test\"].test", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "[\"test\"].test");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -155,7 +155,7 @@ public class GetTest {
 
         objectNode.withArray("test").add(5);
 
-        JsonNode value = DotNotes.get("['test'][0]", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "['test'][0]");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -168,7 +168,7 @@ public class GetTest {
 
         objectNode.withArray("test").add(5);
 
-        JsonNode value = DotNotes.get("[\"test\"][0]", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "[\"test\"][0]");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -181,7 +181,7 @@ public class GetTest {
 
         objectNode.put("0", 5);
 
-        JsonNode value = DotNotes.get("['0']", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "['0']");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -194,7 +194,7 @@ public class GetTest {
 
         objectNode.put("0", 5);
 
-        JsonNode value = DotNotes.get("[\"0\"]", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "[\"0\"]");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -207,7 +207,7 @@ public class GetTest {
 
         objectNode.put("]]][[[", 5);
 
-        JsonNode value = DotNotes.get("[']]][[[']", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "[']]][[[']");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -220,7 +220,7 @@ public class GetTest {
 
         objectNode.put("]]][[[", 5);
 
-        JsonNode value = DotNotes.get("[\"]]][[[\"]", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "[\"]]][[[\"]");
 
         assertNotNull(value);
         assertTrue(value.isNumber());
@@ -229,7 +229,7 @@ public class GetTest {
 
     @Test
     public void getUsingMissingPath() throws Exception {
-        JsonNode value = DotNotes.get("test", factory.objectNode());
+        JsonNode value = DotNotes.get(factory.objectNode(), "test");
 
         assertNotNull(value);
         assertTrue(value.isMissingNode());
@@ -237,7 +237,7 @@ public class GetTest {
 
     @Test
     public void getUsingMissingTarget() throws Exception {
-        JsonNode value = DotNotes.get("test", null);
+        JsonNode value = DotNotes.get(null, "test");
 
         assertNotNull(value);
         assertTrue(value.isMissingNode());
@@ -245,7 +245,7 @@ public class GetTest {
 
     @Test
     public void getUsingMissingNestedTarget() throws Exception {
-        JsonNode value = DotNotes.get("test.test", null);
+        JsonNode value = DotNotes.get(null, "test.test");
 
         assertNotNull(value);
         assertTrue(value.isMissingNode());
@@ -257,7 +257,7 @@ public class GetTest {
 
         objectNode.with("test").with("nest");
 
-        JsonNode value = DotNotes.get("test.test.test", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "test.test.test");
 
         assertNotNull(value);
         assertTrue(value.isMissingNode());
@@ -269,19 +269,19 @@ public class GetTest {
 
         objectNode.with("test").set("test", NullNode.getInstance());
 
-        JsonNode value = DotNotes.get("test.test.test", objectNode);
+        JsonNode value = DotNotes.get(objectNode, "test.test.test");
 
         assertNotNull(value);
         assertTrue(value.isMissingNode());
     }
 
-    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse key starting with '1' at column 1!")
+    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse '123' at character '1', column 1!")
     public void throwErrorWhenProvidedInvalidKey() throws Exception {
-        DotNotes.get("123", factory.numberNode(5));
+        DotNotes.get(factory.numberNode(5), "123");
     }
 
     @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse empty string!")
     public void throwErrorWhenProvidedNullKey() throws Exception {
-        DotNotes.get(null, factory.numberNode(5));
+        DotNotes.get(factory.numberNode(5), null);
     }
 }
