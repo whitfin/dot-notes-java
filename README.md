@@ -14,7 +14,7 @@ This lib is built using Travis and has 100% line/branch coverage, making it pret
 <dependency>
     <groupId>com.zackehh</groupId>
     <artifactId>dot-notes</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 
