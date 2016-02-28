@@ -99,6 +99,22 @@ public class KeysTest {
     }
 
     @Test
+    public void translatesABlankKey() throws Exception {
+        List<NotedKey> keys = DotNotes.keys("test[\"\"]");
+
+        assertNotNull(keys);
+        assertEquals(keys.size(), 2);
+
+        assertNotNull(keys.get(0));
+        assertTrue(keys.get(0).isString());
+        assertEquals(keys.get(0).asString(), "test");
+
+        assertNotNull(keys.get(1));
+        assertTrue(keys.get(1).isString());
+        assertEquals(keys.get(1).asString(), "");
+    }
+
+    @Test
     public void translatesCompoundKeyUsingSingleQuotes() throws Exception {
         List<NotedKey> keys = DotNotes.keys("['test']");
 

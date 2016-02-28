@@ -122,11 +122,6 @@ public class DotNotes {
         // store key as a String
         String input = key.asString();
 
-        // if empty, error
-        if (input.isEmpty()) {
-            throw new ParseException("Unable to escape empty string!");
-        }
-
         // if it's not an accessor, return special key form
         if (!DotUtils.matches(input, DotUtils.ACCESSOR)) {
             return "[\"" + input.replace("\"", "\\\"") + "\"]";

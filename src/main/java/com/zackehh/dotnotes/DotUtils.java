@@ -22,9 +22,9 @@ class DotUtils {
     static final Pattern OPENER
             = Pattern.compile("^(?:[0-9]|\"|')$");
     static final Pattern PROPERTY
-            = Pattern.compile("^\\[(?:'|\")(.+)(?:'|\")]$");
+            = Pattern.compile("^\\[(?:'|\")(.*)(?:'|\")]$");
     static final Pattern SEGMENT
-            = Pattern.compile("^((?:[a-zA-Z_$][a-zA-Z0-9_$]*)|(?:\\[(?:'.+?(?='])'|\".+?(?=\"])\")])|(?:\\[\\d+]))");
+            = Pattern.compile("^((?:[a-zA-Z_$][a-zA-Z0-9_$]*)|(?:\\[(?:'.*?(?='])'|\".*?(?=\"])\")])|(?:\\[\\d+]))");
     static final Pattern KEY
             = Pattern.compile(SEGMENT.toString() + "$");
 

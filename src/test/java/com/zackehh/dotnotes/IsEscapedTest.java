@@ -28,6 +28,11 @@ public class IsEscapedTest {
     }
 
     @Test
+    public void checksIfABlankKeyIsEscaped() throws Exception {
+        assertTrue(DotNotes.isEscaped("[\"\"]"));
+    }
+
+    @Test
     public void checksIfAnEmptyKeyIsEscaped() throws Exception {
         assertFalse(DotNotes.isEscaped(""));
     }

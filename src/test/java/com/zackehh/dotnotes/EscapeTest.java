@@ -55,9 +55,12 @@ public class EscapeTest {
         assertEquals(escaped, "[\"\\\"test\\\"\"]");
     }
 
-    @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to escape empty string!")
-    public void throwErrorAgainstNullKey() throws Exception {
-       DotNotes.escape("");
+    @Test
+    public void escapeUsingAnEmptyString() throws Exception {
+        String escaped = DotNotes.escape("");
+
+        assertNotNull(escaped);
+        assertEquals(escaped, "[\"\"]");
     }
 
     @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unexpected non-string value provided!")
