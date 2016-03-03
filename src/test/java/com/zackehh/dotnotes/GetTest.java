@@ -272,7 +272,7 @@ public class GetTest {
         JsonNode value = DotNotes.get(objectNode, "test.test.test");
 
         assertNotNull(value);
-        assertTrue(value.isMissingNode());
+        assertTrue(value.isNull());
     }
 
     @Test(expectedExceptions = ParseException.class, expectedExceptionsMessageRegExp = "Unable to parse '123' at character '1', column 1!")

@@ -187,7 +187,7 @@ public class DotNotes {
             // if we've hit a dead end
             if (tmp.isMissingNode() || tmp.isNull()) {
                 // short-circuit
-                return MissingNode.getInstance();
+                return tmp;
             }
         }
 
