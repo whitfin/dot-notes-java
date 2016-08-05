@@ -16,8 +16,8 @@
     <url>https://github.com/zackehh/dot-notes-java</url>
 
     <properties>
-        <jackson2.version>2.5.2</jackson2.version>
-        <jacoco.version>0.7.5.201505241946</jacoco.version>
+        <jackson2.version>2.7.4</jackson2.version>
+        <jacoco.version>0.7.7.201606060606</jacoco.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

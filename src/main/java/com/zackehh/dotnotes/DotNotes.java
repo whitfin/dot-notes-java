@@ -323,7 +323,7 @@ public class DotNotes {
      * @param node the node to pass
      * @param handler the handler to pass
      */
-    public static void recurse(JsonNode node, NodeIterator handler) throws ParseException {
+    public static void recurse(JsonNode node, NodeIterator handler) {
         recurse(node, handler, null);
     }
 
@@ -336,7 +336,7 @@ public class DotNotes {
      * @param handler the handler to emit to
      * @param start the starting prefix String, if any
      */
-    public static void recurse(final JsonNode node, final NodeIterator handler, String start) throws ParseException {
+    public static void recurse(final JsonNode node, final NodeIterator handler, String start) {
         // ensure this is a valid container node
         if (!node.isContainerNode()) {
             throw new IllegalArgumentException("Non-object provided to `recurse`!");
@@ -353,25 +353,28 @@ public class DotNotes {
         // iterate through every key in this nest, using iterateNode
         DotUtils.iterateNode(node, new DotUtils.KeyHandler() {
             @Override
-            public void execute(NotedKey key) throws ParseException {
+            public void execute(NotedKey key) {
                 // create a StringBuilder
                 StringBuilder keystr = new StringBuilder(prefix);
 
                 // if we're making paths
                 if (handler.requirePathGeneration()) {
+                    try {
+                        // escape the key
+                        String escaped = escape(key);
 
-                    // escape the key
-                    String escaped = escape(key);
-
-                    // check for a prefix
-                    if (prefix.length() > 0) {
-                        if (escaped.charAt(0) != '[') {
-                            keystr.append(".");
+                        // check for a prefix
+                        if (prefix.length() > 0) {
+                            if (escaped.charAt(0) != '[') {
+                                keystr.append(".");
+                            }
                         }
-                    }
 
-                    // append the key
-                    keystr.append(escaped);
+                        // append the key
+                        keystr.append(escaped);
+                    } catch(ParseException e) {
+                        // never happens
+                    }
                 }
 
                 // grab next level down

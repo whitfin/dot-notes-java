@@ -137,7 +137,7 @@ class DotUtils {
      * @param node the node to iterate
      * @param iterator the callback to pass each key to
      */
-    static void iterateNode(JsonNode node, KeyHandler iterator) throws ParseException {
+    static void iterateNode(JsonNode node, KeyHandler iterator) {
         if(node.isObject()) {
             Iterator<String> names = node.fieldNames();
 
@@ -161,6 +161,6 @@ class DotUtils {
          *
          * @param key the NotedKey to process
          */
-        void execute(NotedKey key) throws ParseException;
+        void execute(NotedKey key);
     }
 }
