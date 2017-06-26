@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.zackehh</groupId>
+    <groupId>io.whitfin</groupId>
     <artifactId>dot-notes</artifactId>
     <version>3.1.2</version>
     <packaging>jar</packaging>
@@ -13,7 +13,7 @@
     <description>
         Simple dot/bracket notation parsing/conversion for JSON.
     </description>
-    <url>https://github.com/zackehh/dot-notes-java</url>
+    <url>https://github.com/whitfin/dot-notes-java</url>
 
     <properties>
         <jackson2.version>2.7.4</jackson2.version>
@@ -23,18 +23,16 @@
 
     <developers>
         <developer>
-            <id>iwhitfield</id>
+            <id>whitfin</id>
             <name>Isaac Whitfield</name>
-            <email>iw@zackehh.com</email>
-            <organization>Appcelerator, Inc.</organization>
-            <organizationUrl>http://www.appcelerator.com</organizationUrl>
+            <email>isaac@whitfin.io</email>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:zackehh/dot-notes-java.git</connection>
-        <developerConnection>scm:git:git@github.com:zackehh/dot-notes-java.git</developerConnection>
-        <url>git@github.com:zackehh/dot-notes-java.git</url>
+        <connection>scm:git:git@github.com:whitfin/dot-notes-java.git</connection>
+        <developerConnection>scm:git:git@github.com:whitfin/dot-notes-java.git</developerConnection>
+        <url>git@github.com:whitfin/dot-notes-java.git</url>
     </scm>
 
     <licenses>
