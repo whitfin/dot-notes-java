@@ -105,7 +105,7 @@ class DotUtils {
 
             int num = key.asNumber();
 
-            if (num > node.size()) {
+            if (num >= node.size()) {
                 arr.add(value);
             } else {
                 arr.set(num, value);
