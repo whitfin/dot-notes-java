@@ -1,8 +1,8 @@
 # dot-notes-java
 
-[![Build Status](https://travis-ci.org/zackehh/dot-notes-java.svg?branch=master)](https://travis-ci.org/zackehh/dot-notes-java) [![Coverage Status](https://coveralls.io/repos/zackehh/dot-notes-java/badge.svg?branch=master&service=github)](https://coveralls.io/github/zackehh/dot-notes-java?branch=master)
+[![Build Status](https://travis-ci.org/whitfin/dot-notes-java.svg?branch=master)](https://travis-ci.org/whitfin/dot-notes-java) [![Coverage Status](https://coveralls.io/repos/whitfin/dot-notes-java/badge.svg?branch=master&service=github)](https://coveralls.io/github/whitfin/dot-notes-java?branch=master)
 
-This is a Java port of [dot-notes](http://github.com/zackehh/dot-notes) to work with Jackson JSON. The interface is the same, so please check out the [documentation](https://github.com/zackehh/dot-notes/wiki) for example usage. You can find the Javadocs from the latest release [here](http://www.javadoc.io/doc/com.zackehh/dot-notes) - they should be pretty self explanatory.
+This is a Java port of [dot-notes](http://github.com/whitfin/dot-notes) to work with Jackson JSON. The interface is the same, so please check out the [documentation](https://github.com/whitfin/dot-notes/wiki) for example usage. You can find the Javadocs from the latest release [here](http://www.javadoc.io/doc/com.whitfin/dot-notes) - they should be pretty self explanatory.
 
 This lib is built using Travis and has 100% line/branch coverage, making it pretty robust. This does not mean it's perfect however, so make sure you have appropriate tests in your code to cover your usage.
 
@@ -12,7 +12,7 @@ This lib is built using Travis and has 100% line/branch coverage, making it pret
 
 ```
 <dependency>
-    <groupId>com.zackehh</groupId>
+    <groupId>io.whitfin</groupId>
     <artifactId>dot-notes</artifactId>
     <version>3.1.0</version>
 </dependency>

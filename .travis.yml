@@ -1,3 +1,11 @@
 language: java
+dist: trusty
+jdk:
+  - oraclejdk11
+  - oraclejdk9
+  - oraclejdk8
+  - openjdk11
+  - openjdk8
+  - openjdk7
 script:
   - mvn clean test jacoco:report coveralls:report
